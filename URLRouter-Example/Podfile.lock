@@ -3,7 +3,8 @@ PODS:
     - URLRouter/Matcher (= 0.1.0)
     - URLRouter/Router (= 0.1.0)
   - URLRouter/Matcher (0.1.0)
-  - URLRouter/Router (0.1.0)
+  - URLRouter/Router (0.1.0):
+    - URLRouter/Matcher
   - URLRouter/Tests (0.1.0):
     - URLRouter/Matcher
     - URLRouter/Router
@@ -17,7 +18,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  URLRouter: cbc2728ef732d706fa35c1e55485c83e70db8623
+  URLRouter: 9c10a45d9c7537359d98fcb7d0de111d46a9c990
 
 PODFILE CHECKSUM: 1461ea85bb453139fa7b8828b7e731deaeff078d
 

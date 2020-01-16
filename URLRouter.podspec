@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   s.subspec 'Router' do |sp|
       sp.frameworks = 'Foundation'
       sp.source_files = 'Source/URLRouter/**/*.swift'
+      sp.dependency 'URLRouter/Matcher'
   end
   
   s.default_subspecs = ['Matcher', 'Router']
