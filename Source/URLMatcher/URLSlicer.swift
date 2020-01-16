@@ -12,19 +12,22 @@ public final class URLPatternContext {
     }
 }
 
-public final class URLSlicer {
-    public class func slice(url: URLConvertible) throws -> [URLSlice] {
+public final class URLSlicer {}
+
+// MARK: - Public
+public extension URLSlicer {
+    class func slice(url: URLConvertible) throws -> [URLSlice] {
         return slice(components: try makeURLComponents(url))
     }
     
-    public class func slice(components: URLComponents) -> [URLSlice] {
+    class func slice(components: URLComponents) -> [URLSlice] {
         var slices = commonSlices(from: components)
         let paths = components.paths
         slices.append(contentsOf: paths.map({.path($0)}))
         return slices
     }
         
-    public class func parse(pattern url: URLConvertible) throws -> URLPatternContext {
+    class func parse(pattern url: URLConvertible) throws -> URLPatternContext {
         let components = try makeURLComponents(url)
         var patterns = commonSlices(from: components)
         let path = components.path
@@ -84,15 +87,18 @@ public final class URLSlicer {
         
         return URLPatternContext(patterns: patterns, pathVars: finalPathVars, queryVars: finalQueryVars)
     }
-    
-    private class func makeURLComponents(_ url: URLConvertible) throws -> URLComponents {
+}
+
+// MARK: - Internals
+private extension URLSlicer {
+    class func makeURLComponents(_ url: URLConvertible) throws -> URLComponents {
         guard let components = url.urlComponents else {
             throw URLError(.badURL, userInfo: [NSLocalizedDescriptionKey: "Cannot parse URL: \(url.absoluteString)"])
         }
         return components
     }
     
-    private class func commonSlices(from components: URLComponents) -> [URLSlice] {
+    class func commonSlices(from components: URLComponents) -> [URLSlice] {
         var slices: [URLSlice] = []
         if let scheme = components.scheme {
             slices.append(.scheme(scheme))

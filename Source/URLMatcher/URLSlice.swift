@@ -5,25 +5,6 @@ public enum URLSlice: Equatable, Hashable {
     case authority(String) // <user>:<password>@<host>:<port>
     case path(String)
     
-    public static var schemeWildcard: URLSlice {
-        return .scheme(WildCharacter)
-    }
-    
-    public static var authorityWildcard: URLSlice {
-        return .authority(WildCharacter)
-    }
-    
-    public static var pathWildcard: URLSlice {
-        return .path(WildCharacter)
-    }
-    
-    public static var pathVariable: URLSlice {
-        return .path(VarCharacter)
-    }
-    
-    public static let VarCharacter = "<*>"
-    public static let WildCharacter = "*"
-    
     public var rawValue: String {
         switch self {
         case let .scheme(scheme):
@@ -33,6 +14,28 @@ public enum URLSlice: Equatable, Hashable {
         case let .path(path):
             return path
         }
+    }
+}
+
+// MARK: - Variable & Wildcard
+public extension URLSlice {
+    static let VarCharacter = "<*>"
+    static let WildCharacter = "*"
+    
+    static var schemeWildcard: URLSlice {
+        return .scheme(WildCharacter)
+    }
+    
+    static var authorityWildcard: URLSlice {
+        return .authority(WildCharacter)
+    }
+    
+    static var pathWildcard: URLSlice {
+        return .path(WildCharacter)
+    }
+    
+    static var pathVariable: URLSlice {
+        return .path(VarCharacter)
     }
 }
 

@@ -1,57 +1,62 @@
 import Foundation
 
-public struct URLMatchContext {
-    public let tag: String
-    public let matched: [URLSlicePattern]
-    public let parameters: [AnyHashable: Any]
+public final class URLMatcher {
+    // MARK: - Init
+    public init() {}
     
-    public init(tag: String, matched: [URLSlicePattern], parameters: [AnyHashable: Any]) {
-        self.tag = tag
-        self.matched = matched
-        self.parameters = parameters
+    // MARK: - Attrs
+    private var routesMap: NSMutableDictionary = NSMutableDictionary()
+    private static let serialQueue = DispatchQueue.init(label: "cn.wessonwu.URLRouter.URLMatcher.routesMap") // Thread safe
+}
+
+// MARK: - URLValue Converters
+public extension URLMatcher {
+    static var customValueTypes: [String: URLValueCompatible.Type] = ["json": [AnyHashable: Any].self]
+    class var buildInValueTypes: [String: URLValueCompatible.Type] {
+        return [
+            // string
+            "string": String.self,
+            // bool
+            "bool": Bool.self,
+            // int
+            "int": Int.self,
+            "int8": Int8.self,
+            "int16": Int16.self,
+            "int32": Int32.self,
+            "int64": Int64.self,
+            // uint
+            "uint": UInt.self,
+            "uint8": UInt8.self,
+            "uint16": UInt16.self,
+            "uint32": UInt32.self,
+            "uint64": UInt64.self,
+            // float
+            "float": Float.self,
+            "float32": Float32.self,
+            "float64": Float64.self,
+            // double
+            "double": Double.self
+        ]
+    }
+    
+    class func valueType(of type: String) -> URLValueCompatible.Type? {
+        if let value = buildInValueTypes[type] {
+            return value
+        }
+        return customValueTypes[type]
     }
 }
 
-public final class URLMatcher {
-    // MARK: - URLValue converters
-    public static let buildInValueTypes: [String: URLValueCompatible.Type] = [
-        // string
-        "string": String.self,
-        // bool
-        "bool": Bool.self,
-        // int
-        "int": Int.self,
-        "int8": Int8.self,
-        "int16": Int16.self,
-        "int32": Int32.self,
-        "int64": Int64.self,
-        // uint
-        "uint": UInt.self,
-        "uint8": UInt8.self,
-        "uint16": UInt16.self,
-        "uint32": UInt32.self,
-        "uint64": UInt64.self,
-        // float
-        "float": Float.self,
-        "float32": Float32.self,
-        "float64": Float64.self,
-        // double
-        "double": Double.self
-    ]
-    
-    public static var customValueTypes: [String: URLValueCompatible.Type] = ["json": [AnyHashable: Any].self]
-    
-    
-    
-    // MARK: - Core (canMatch & match)
-    public func canMatch(_ url: URLConvertible, exactly: Bool = false) -> Bool {
+// MARK: - Core (canMatch & match)
+public extension URLMatcher {
+    func canMatch(_ url: URLConvertible, exactly: Bool = false) -> Bool {
         guard let components = url.urlComponents else {
             return false
         }
         return doMatch(URLSlicer.slice(components: components), exactly: exactly) != nil
     }
     
-    public func match(_ url: URLConvertible, exactly: Bool = false) -> URLMatchContext? {
+    func match(_ url: URLConvertible, exactly: Bool = false) -> URLMatchResult? {
         guard let components = url.urlComponents else {
             return nil
         }
@@ -75,15 +80,8 @@ public final class URLMatcher {
         pathValues.forEach { (key, value) in
             parameters[key] = value
         }
-        return URLMatchContext(tag: endpoint.tag, matched: result.matched, parameters: parameters)
+        return URLMatchResult(tag: endpoint.tag, matched: result.matched, parameters: parameters)
     }
-    
-    // MARK: - Init
-    public init() {}
-    
-    // MARK: - Attrs
-    private var routesMap: NSMutableDictionary = NSMutableDictionary()
-    private static let serialQueue = DispatchQueue.init(label: "cn.wessonwu.URLRouter.URLMatcher.routesMap") // Thread safe
 }
 
 // MARK: - Register & Unregister URLPatterns
@@ -157,18 +155,11 @@ public extension URLMatcher {
         }
         .joined(separator: "/")
     }
-    
-    class func valueType(of type: String) -> URLValueCompatible.Type? {
-        if let value = buildInValueTypes[type] {
-            return value
-        }
-        return customValueTypes[type]
-    }
 }
 
-// MARK: - URLMatcher Internals
-extension URLMatcher {
-    private func addURLPatternRoute(patterns: [URLSlicePattern]) -> NSMutableDictionary {
+// MARK: - Internals
+private extension URLMatcher {
+    func addURLPatternRoute(patterns: [URLSlicePattern]) -> NSMutableDictionary {
         var subRoutes = self.routesMap
         for pattern in patterns {
             let map = (subRoutes[pattern] as? NSMutableDictionary) ?? NSMutableDictionary()
@@ -178,9 +169,9 @@ extension URLMatcher {
         return subRoutes
     }
 
-    private typealias URLValueEntry = (name: String, value: URLValueCompatible)
-    private typealias DoMatchResult = (matched: [URLSlicePattern], pathValues: [URLValueEntry], endpoint: URLPatternEndpoint)
-    private func doMatch(_ slices: [URLSlice], exactly: Bool) -> DoMatchResult? {
+    typealias URLValueEntry = (name: String, value: URLValueCompatible)
+    typealias DoMatchResult = (matched: [URLSlicePattern], pathValues: [URLValueEntry], endpoint: URLPatternEndpoint)
+    func doMatch(_ slices: [URLSlice], exactly: Bool) -> DoMatchResult? {
         return URLMatcher.serialQueue.sync {
             if exactly {
                 return doMatchExactly(slices)
@@ -196,7 +187,7 @@ extension URLMatcher {
         }
     }
     
-    private func doMatchExactly(_ slices: [URLSlice]) -> DoMatchResult? {
+    func doMatchExactly(_ slices: [URLSlice]) -> DoMatchResult? {
         var matched: [URLSlicePattern] = []
         var route = self.routesMap
         for slice in slices {
@@ -213,7 +204,7 @@ extension URLMatcher {
         return nil
     }
     
-    private func backtrackingMatchRecursively(_ route: NSMutableDictionary, slices: [URLSlice], index: Int, matched: inout [URLSlicePattern], pathValues: inout [URLValueEntry?]) -> URLPatternEndpoint? {
+    func backtrackingMatchRecursively(_ route: NSMutableDictionary, slices: [URLSlice], index: Int, matched: inout [URLSlicePattern], pathValues: inout [URLValueEntry?]) -> URLPatternEndpoint? {
         if index == slices.count {
             return route[URLPatternEndpoint.key] as? URLPatternEndpoint
         }

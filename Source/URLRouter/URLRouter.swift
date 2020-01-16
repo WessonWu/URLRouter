@@ -65,12 +65,12 @@ public final class URLRouter {
     }
     
     public func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Handler? {
-        guard let matchContext = matcher.match(url),
-            let handler = openURLHandlers[matchContext.tag] else {
+        guard let result = matcher.match(url),
+            let handler = openURLHandlers[result.tag] else {
             return nil
         }
         
-        var origin = matchContext.parameters
+        var origin = result.parameters
         if let custom = parameters {
             origin.merge(custom, uniquingKeysWith: {_, v2 in v2 })
         }

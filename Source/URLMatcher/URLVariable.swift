@@ -21,6 +21,12 @@ public struct URLVariable {
     }
 }
 
+extension URLVariable: CustomStringConvertible {
+    public var description: String {
+        return ["name": name, "type": type].description
+    }
+}
+
 extension URLVariable: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(name)
@@ -56,8 +62,10 @@ public extension URLVariable {
         }
         return "\(queryItem.name)=\(value)"
     }
-    
-    internal static func unwrap(from str: String) -> String? {
+}
+
+extension URLVariable {
+    static func unwrap(from str: String) -> String? {
         guard str.hasPrefix("<") && str.hasSuffix(">") else {
             return nil
         }

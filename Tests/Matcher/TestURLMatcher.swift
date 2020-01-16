@@ -43,9 +43,9 @@ class TestURLMatcher: XCTestCase {
         assertion(result)
     }
     
-    func match(_ url: URLConvertible, exactly: Bool = false, assertion: (URLMatchContext?) -> Void) {
-        let context = matcher.match(url, exactly: exactly)
-        assertion(context)
+    func match(_ url: URLConvertible, exactly: Bool = false, assertion: (URLMatchResult?) -> Void) {
+        let result = matcher.match(url, exactly: exactly)
+        assertion(result)
     }
     
     func registerSuccess(tag: String) -> RegisterAssertion {
