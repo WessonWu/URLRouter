@@ -44,6 +44,7 @@
 		0A817CD923D05A3200876BD1 /* UserListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserListViewController.swift; sourceTree = "<group>"; };
 		0A817CDB23D05A3200876BD1 /* RepoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepoCell.swift; sourceTree = "<group>"; };
 		0A817CDC23D05A3200876BD1 /* UserCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserCell.swift; sourceTree = "<group>"; };
+		0A817CE323D067DB00876BD1 /* UseRouter.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UseRouter.xcconfig; sourceTree = "<group>"; };
 		0AE46A1223CFF1EE001A9D68 /* URLRouter-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "URLRouter-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0AE46A1523CFF1EE001A9D68 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0AE46A1E23CFF1F0001A9D68 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -127,6 +128,7 @@
 		0AE46A0923CFF1EE001A9D68 = {
 			isa = PBXGroup;
 			children = (
+				0A817CE323D067DB00876BD1 /* UseRouter.xcconfig */,
 				0AE46A1423CFF1EE001A9D68 /* URLRouter-Example */,
 				0AE46A2B23CFF1F1001A9D68 /* URLRouter-ExampleTests */,
 				0AE46A1323CFF1EE001A9D68 /* Products */,
@@ -401,6 +403,7 @@
 /* Begin XCBuildConfiguration section */
 		0AE46A2F23CFF1F1001A9D68 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0A817CE323D067DB00876BD1 /* UseRouter.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -461,6 +464,7 @@
 		};
 		0AE46A3023CFF1F1001A9D68 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0A817CE323D067DB00876BD1 /* UseRouter.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -525,6 +529,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
 				PRODUCT_BUNDLE_IDENTIFIER = "cn.wessonwu.demos.URLRouter-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -544,6 +549,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS";
 				PRODUCT_BUNDLE_IDENTIFIER = "cn.wessonwu.demos.URLRouter-Example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
