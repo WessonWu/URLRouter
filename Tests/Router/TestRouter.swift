@@ -49,11 +49,11 @@ class TestRouter: XCTestCase {
         }
         
         router.open("https://www.example.com/user/host") { (context) in
-            XCTAssertEqual(context.url.absoluteString, "https://www.example.com/user/host")
+            XCTAssertEqual(context.pattern, "https://*")
         }
         
         router.open("unknown://www.example.com/user/host") { (context) in
-            XCTAssertEqual(context.url.absoluteString, "unknown://www.example.com/user/host")
+            XCTAssertEqual(context.pattern, "*://*")
         }
     }
     
