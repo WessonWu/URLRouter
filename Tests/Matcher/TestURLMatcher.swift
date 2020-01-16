@@ -307,6 +307,11 @@ class TestURLMatcher: XCTestCase {
         register("://baidu.com", assertion: registerFailed(mockedError: .underlying))
         register("<ss>://baidu.com", assertion: registerFailed(mockedError: .underlying))
         register("@://baidu.com", assertion: registerFailed(mockedError: .underlying))
+        register("1abc://baidu.com", assertion: registerFailed(mockedError: .underlying))
+        register("1abc*://baidu.com", assertion: registerFailed(mockedError: .underlying))
+        register("*1abc://baidu.com", assertion: registerFailed(mockedError: .underlying))
+        
+        register("abc1://baidu.com", assertion: registerSuccess(tag: "abc1://baidu.com"))
     }
 
 }
