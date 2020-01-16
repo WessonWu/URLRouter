@@ -1,0 +1,16 @@
+PODS:
+  - URLRouter (0.1.0)
+
+DEPENDENCIES:
+  - URLRouter (from `../`)
+
+EXTERNAL SOURCES:
+  URLRouter:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  URLRouter: 57a80272e10f78dc99baf79b2228912e9d74cc3d
+
+PODFILE CHECKSUM: eb2a313000aae35f5245a5e8198f17077e30cb13
+
+COCOAPODS: 1.8.4
