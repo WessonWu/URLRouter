@@ -12,13 +12,14 @@ public final class URLRouter {
 //    public typealias AnyValueHandler = (Context) -> Any?
     
     public typealias Completion = (Context) -> Void
+    public typealias Handler = () -> Bool
     public final class Context {
         public let url: URLConvertible
         public let parameters: [AnyHashable: Any]
-        public let userInfo: [AnyHashable: Any]?
+        public let userInfo: Any?
         public let completion: Completion?
         
-        public init(url: URLConvertible, parameters: [AnyHashable: Any], userInfo: [AnyHashable: Any]? = nil, completion: Completion? = nil) {
+        public init(url: URLConvertible, parameters: [AnyHashable: Any], userInfo: Any? = nil, completion: Completion? = nil) {
             self.url = url
             self.parameters = parameters
             self.userInfo = userInfo
@@ -40,6 +41,15 @@ public final class URLRouter {
         return result
     }
     
+    @discardableResult
+    public func unregister(_ pattern: URLConvertible) -> Bool {
+        if let tag = matcher.unregister(pattern: pattern) {
+            openURLHandlers.removeValue(forKey: tag)
+            return true
+        }
+        return false
+    }
+    
     // MARK: - canOpen
     public func canOpen(_ url: URLConvertible, exactly: Bool = false) -> Bool {
         return matcher.canMatch(url, exactly: exactly)
@@ -47,11 +57,17 @@ public final class URLRouter {
     
     // MARK: - open
     @discardableResult
-    public func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: [AnyHashable: Any]? = nil, completion: Completion? = nil) -> Bool {
-        guard let matchContext = matcher.match(url, exactly: false),
-            let handler = openURLHandlers[matchContext.tag] else {
-            
+    public func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Bool {
+        guard let handler = self.handler(for: url, parameters: parameters, userInfo: userInfo, completion: completion) else {
             return false
+        }
+        return handler()
+    }
+    
+    public func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Handler? {
+        guard let matchContext = matcher.match(url),
+            let handler = openURLHandlers[matchContext.tag] else {
+            return nil
         }
         
         var origin = matchContext.parameters
@@ -59,7 +75,7 @@ public final class URLRouter {
             origin.merge(custom, uniquingKeysWith: {_, v2 in v2 })
         }
         let context = Context(url: url, parameters: origin, userInfo: userInfo, completion: completion)
-        return handler(context)
+        return { handler(context) }
     }
     
     // MARK: - private Attrs

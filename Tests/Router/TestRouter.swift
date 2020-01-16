@@ -14,7 +14,7 @@ class TestRouter: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() {
+    func testNormal() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
@@ -30,9 +30,9 @@ class TestRouter: XCTestCase {
             XCTAssertEqual(context.string(for: "username"), "james")
         }
         
-        router.open("myapp://host/user/kobe", userInfo: ["hello": "world"]) { (context) in
+        router.open("myapp://host/user/kobe", userInfo: "hello") { (context) in
             XCTAssertEqual(context.string(for: "username"), "kobe")
-            XCTAssertEqual(context.userInfo?["hello"] as? String, "world")
+            XCTAssertEqual(context.userInfo as? String, "hello")
         }
         
         XCTAssertFalse(router.canOpen("myapp://host/user"))
@@ -55,5 +55,18 @@ class TestRouter: XCTestCase {
         router.open("unknown://www.example.com/user/host") { (context) in
             XCTAssertEqual(context.url.absoluteString, "unknown://www.example.com/user/host")
         }
+    }
+    
+    func testUnregister() {
+        router.register("https://*") { (context) -> Bool in
+            context.completion?(context)
+            return true
+        }
+        
+        XCTAssertTrue(router.canOpen("https://www.baidu.com/path1"))
+        XCTAssertFalse(router.canOpen("https://www.baidu.com/path1", exactly: true))
+        
+        XCTAssertTrue(router.unregister("https://*"))
+        XCTAssertFalse(router.canOpen("https://www.baidu.com/path1"))
     }
 }

@@ -112,29 +112,30 @@ public final class URLMatcher {
         }
     }
     
-    public func unregister(pattern url: URLConvertible) -> Bool {
+    @discardableResult
+    public func unregister(pattern url: URLConvertible) -> String? {
         let context: URLPatternContext
         do {
             context = try URLSlicer.parse(pattern: url)
         } catch {
-            return false
+            return nil
         }
         
         return URLMatcher.serialQueue.sync {
             var route = self.routesMap
             for slice in context.patterns {
                 guard let map = route[slice] as? NSMutableDictionary else {
-                    return false
+                    return nil
                 }
                 route = map
             }
             
-            if route.object(forKey: URLPatternEndpoint.key) != nil {
+            if let endpoint = route.object(forKey: URLPatternEndpoint.key) as? URLPatternEndpoint {
                 route.removeObject(forKey: URLPatternEndpoint.key)
-                return true
+                return endpoint.tag
             }
             
-            return false
+            return nil
         }
     }
     

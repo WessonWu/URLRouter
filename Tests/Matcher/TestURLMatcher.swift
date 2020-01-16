@@ -268,7 +268,7 @@ class TestURLMatcher: XCTestCase {
             XCTAssertEqual(context?.tag, "*://*")
         }
         
-        XCTAssertTrue(matcher.unregister(pattern: "*://*/*"))
+        XCTAssertNotNil(matcher.unregister(pattern: "*://*/*"))
         
         match("test9://not_test9/not_test9/not_test9...") { (context) in
             XCTAssertNotNil(context)
