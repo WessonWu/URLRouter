@@ -26,10 +26,11 @@ class TestURLMatcher: XCTestCase {
         let lastName: String
     }
     
-    let matcher = URLMatcher()
+    var matcher: URLMatcher!
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        self.matcher = URLMatcher()
     }
 
     override func tearDown() {
@@ -57,28 +58,12 @@ class TestURLMatcher: XCTestCase {
             }
         }
     }
-    
-    
-    enum MockedURLRouterError: Int {
-        case unresolvedURLVariable
-        case ambiguousURLVariable
-        case ambiguousRegistration
-        case underlying
-    }
-    func registerFailed(mockedError: MockedURLRouterError) -> RegisterAssertion {
+
+    func registerFailed(mockedError: MockedURLMatchError) -> RegisterAssertion {
         return { result in
             switch result {
             case let .failure(error):
-                switch error {
-                case .unresolvedURLVariable:
-                    XCTAssertEqual(mockedError, MockedURLRouterError.unresolvedURLVariable)
-                case .ambiguousURLVariable:
-                    XCTAssertEqual(mockedError, MockedURLRouterError.ambiguousURLVariable)
-                case .ambiguousRegistration:
-                    XCTAssertEqual(mockedError, MockedURLRouterError.ambiguousRegistration)
-                case .underlying:
-                    XCTAssertEqual(mockedError, MockedURLRouterError.underlying)
-                }
+                XCTAssertEqual(error.asMockedError(), mockedError)
             case .success:
                 XCTFail("Register Success")
             }

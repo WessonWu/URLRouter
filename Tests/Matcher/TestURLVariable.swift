@@ -2,42 +2,30 @@ import XCTest
 import URLRouter
 
 class TestURLVariable: XCTestCase {
-
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() {
+    func testVariableInit() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        
+        XCTAssertEqual(URLVariable(path: "var: int")?.type, "int")
+        XCTAssertEqual(URLVariable(path: "var: iNt")?.type, "int")
+        XCTAssertEqual(URLVariable(path: "var: inT")?.type, "int")
+        XCTAssertEqual(URLVariable(path: "var: INT")?.type, "int")
+        XCTAssertEqual(URLVariable(path: "var: Int")?.type, "int")
         
         let var1 = URLVariable(path: "username: String")
         let var2 = URLVariable(path: "username: int")
         
-        XCTAssertNotNil(var1)
-        XCTAssertNotNil(var2)
-        XCTAssert(var1 == var2)
-        XCTAssert(var1!.name == "username")
-        XCTAssert(var1!.type == "string")
-        XCTAssert(var2!.name == "username")
-        XCTAssert(var2!.type == "int")
+        XCTAssertEqual(var1?.name, "username")
+        XCTAssertEqual(var2?.name, "username")
+        XCTAssertEqual(var1?.type, "string")
+        XCTAssertEqual(var2?.type, "int")
+        XCTAssertEqual(var1, var2)
         
         XCTAssertNil(URLVariable(path: ""))
         XCTAssertNil(URLVariable(path: "username"))
         XCTAssertNil(URLVariable(path: "username:"))
         XCTAssertNil(URLVariable(path: " :int"))
         XCTAssertNil(URLVariable(path: "   :   int"))
+        XCTAssertNil(URLVariable(path: ":"))
     }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }

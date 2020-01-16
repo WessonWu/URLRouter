@@ -34,6 +34,7 @@ Pod::Spec.new do |s|
     test_spec.source_files = 'Tests/**/*'
     test_spec.dependency 'URLRouter/Matcher'
     test_spec.dependency 'URLRouter/Router'
+    test_spec.dependency 'Nimb'
   end
 
 end

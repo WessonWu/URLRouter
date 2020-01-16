@@ -79,7 +79,10 @@ public final class URLSlicer {
             queryVars.append(declare)
         }
         
-        return URLPatternContext(patterns: patterns, pathVars: pathVars, queryVars: queryVars)
+        let finalPathVars = pathVars.isEmpty ? nil : pathVars
+        let finalQueryVars = queryVars.isEmpty ? nil : queryVars
+        
+        return URLPatternContext(patterns: patterns, pathVars: finalPathVars, queryVars: finalQueryVars)
     }
     
     private class func makeURLComponents(_ url: URLConvertible) throws -> URLComponents {
