@@ -7,7 +7,7 @@ import Foundation
 public typealias URLRouterError = URLMatchError
 
 public final class URLRouter {
-    public typealias OpenURLHandler = (Context) -> Bool
+    public typealias OpenURLHandler = (Context, Completion?) -> Bool
     
     public typealias Completion = (Context) -> Void
     public typealias Handler = () -> Bool
@@ -16,23 +16,24 @@ public final class URLRouter {
         public let pattern: String
         public let parameters: [AnyHashable: Any]
         public let userInfo: Any?
-        public let completion: Completion?
         
-        public init(url: URLConvertible, pattern: String, parameters: [AnyHashable: Any], userInfo: Any? = nil, completion: Completion? = nil) {
+        public init(url: URLConvertible, pattern: String, parameters: [AnyHashable: Any], userInfo: Any? = nil) {
             self.url = url
             self.pattern = pattern
             self.parameters = parameters
             self.userInfo = userInfo
-            self.completion = completion
         }
     }
     
     // default Router
     public static let `default` = URLRouter()
     // MARK: - Init
-    public init() {}
+    public init(plugins: [URLRouterPluginType] = []) {
+        self.plugins = plugins
+    }
     // MARK: - private Attrs
     private let matcher = URLMatcher()
+    private let plugins: [URLRouterPluginType]
     @SerialAccess(value: [:]) private var openURLHandlers: [AnyHashable: OpenURLHandler]
 }
 
@@ -82,8 +83,17 @@ public extension URLRouter {
         if let custom = parameters {
             origin.merge(custom, uniquingKeysWith: {_, v2 in v2 })
         }
-        let context = Context(url: url, pattern: result.tag, parameters: origin, userInfo: userInfo, completion: completion)
-        return { handler(context) }
+        let context = Context(url: url, pattern: result.tag, parameters: origin, userInfo: userInfo)
+        guard plugins.reduce(true, { $0 && $1.shouldOpenURL(url, context: context) }) else {
+            return nil
+        }
+        return {
+            self.plugins.forEach { $0.willOpenURL(url, context: context)}
+            defer {
+                self.plugins.forEach { $0.didOpenURL(url, context: context) }
+            }
+            return handler(context, completion)
+        }
     }
 }
 

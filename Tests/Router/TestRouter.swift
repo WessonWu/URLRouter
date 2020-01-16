@@ -18,8 +18,8 @@ class TestRouter: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
-        router.register("myapp://host/user/<username: string>") { (context) -> Bool in
-            context.completion?(context)
+        router.register("myapp://host/user/<username: string>") { (context, completion) -> Bool in
+            completion?(context)
             return true
         }
         
@@ -38,13 +38,13 @@ class TestRouter: XCTestCase {
         XCTAssertFalse(router.canOpen("myapp://host/user"))
         
         // 通配符
-        router.register("https://*") { (context) -> Bool in
-            context.completion?(context)
+        router.register("https://*") { (context, completion) -> Bool in
+            completion?(context)
             return true
         }
         
-        router.register("*://*") { (context) -> Bool in
-            context.completion?(context)
+        router.register("*://*") { (context, completion) -> Bool in
+            completion?(context)
             return true
         }
         
@@ -58,8 +58,8 @@ class TestRouter: XCTestCase {
     }
     
     func testUnregister() {
-        router.register("https://*") { (context) -> Bool in
-            context.completion?(context)
+        router.register("https://*") { (context, completion) -> Bool in
+            completion?(context)
             return true
         }
         
