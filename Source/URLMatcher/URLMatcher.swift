@@ -13,6 +13,7 @@ public struct URLMatchContext {
 }
 
 public final class URLMatcher {
+    // MARK: - URLValue converters
     public static let buildInValueTypes: [String: URLValueCompatible.Type] = [
         // string
         "string": String.self,
@@ -40,18 +41,9 @@ public final class URLMatcher {
     
     public static var customValueTypes: [String: URLValueCompatible.Type] = ["json": [AnyHashable: Any].self]
     
-    public class func valueType(of type: String) -> URLValueCompatible.Type? {
-        if let value = buildInValueTypes[type] {
-            return value
-        }
-        return customValueTypes[type]
-    }
     
     
-    private var routesMap: NSMutableDictionary = NSMutableDictionary()
-    private static let serialQueue = DispatchQueue.init(label: "cn.wessonwu.URLRouter.URLMatcher.routesMap") // Thread safe
-    public init() {}
-    
+    // MARK: - Core (canMatch & match)
     public func canMatch(_ url: URLConvertible, exactly: Bool = false) -> Bool {
         guard let components = url.urlComponents else {
             return false
@@ -86,8 +78,18 @@ public final class URLMatcher {
         return URLMatchContext(tag: endpoint.tag, matched: result.matched, parameters: parameters)
     }
     
+    // MARK: - Init
+    public init() {}
+    
+    // MARK: - Attrs
+    private var routesMap: NSMutableDictionary = NSMutableDictionary()
+    private static let serialQueue = DispatchQueue.init(label: "cn.wessonwu.URLRouter.URLMatcher.routesMap") // Thread safe
+}
+
+// MARK: - Register & Unregister URLPatterns
+public extension URLMatcher {
     @discardableResult
-    public func register(pattern url: URLConvertible, tag: String? = nil) -> Result<String, URLMatchError> {
+    func register(pattern url: URLConvertible, tag: String? = nil) -> Result<String, URLMatchError> {
         let context: URLPatternContext
         do {
             context = try URLSlicer.parse(pattern: url)
@@ -113,7 +115,7 @@ public final class URLMatcher {
     }
     
     @discardableResult
-    public func unregister(pattern url: URLConvertible) -> String? {
+    func unregister(pattern url: URLConvertible) -> String? {
         let context: URLPatternContext
         do {
             context = try URLSlicer.parse(pattern: url)
@@ -138,8 +140,11 @@ public final class URLMatcher {
             return nil
         }
     }
-    
-    public static func format(for patterns: [URLSlicePattern]) -> String {
+}
+
+// MARK: - URLMatcher Helpers
+public extension URLMatcher {
+    class func format(for patterns: [URLSlicePattern]) -> String {
         return patterns.map { (pattern) -> String in
             switch pattern {
             case let .scheme(scheme):
@@ -153,6 +158,16 @@ public final class URLMatcher {
         .joined(separator: "/")
     }
     
+    class func valueType(of type: String) -> URLValueCompatible.Type? {
+        if let value = buildInValueTypes[type] {
+            return value
+        }
+        return customValueTypes[type]
+    }
+}
+
+// MARK: - URLMatcher Internals
+extension URLMatcher {
     private func addURLPatternRoute(patterns: [URLSlicePattern]) -> NSMutableDictionary {
         var subRoutes = self.routesMap
         for pattern in patterns {
