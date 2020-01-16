@@ -87,12 +87,12 @@ public final class URLMatcher {
     }
     
     @discardableResult
-    public func register(pattern url: URLConvertible, tag: String? = nil) -> Result<String, URLRouterError> {
+    public func register(pattern url: URLConvertible, tag: String? = nil) -> Result<String, URLMatchError> {
         let context: URLPatternContext
         do {
             context = try URLSlicer.parse(pattern: url)
         } catch {
-            if let resolved = error as? URLRouterError {
+            if let resolved = error as? URLMatchError {
                 return .failure(resolved)
             }
             return .failure(.underlying(error))

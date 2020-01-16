@@ -4,6 +4,8 @@ import Foundation
 // match: myapp://module/user/xiaoming?age=23&male=true
 // parameters: ["username": "xiaoming", "age": 23, "male": true]
 
+public typealias URLRouterError = URLMatchError
+
 public final class URLRouter {
     public typealias OpenURLHandler = (Context) -> Bool
 //    public typealias ViewControllerHandler = (Context) -> UIViewController?

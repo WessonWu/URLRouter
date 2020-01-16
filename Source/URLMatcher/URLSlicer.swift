@@ -47,10 +47,10 @@ public final class URLSlicer {
         try paths.forEach { path in
             if let format = URLVariable.unwrap(from: path) {
                 guard let declare = URLVariable(path: format) else {
-                    throw URLRouterError.unresolvedURLVariable(format)
+                    throw URLMatchError.unresolvedURLVariable(format)
                 }
                 if let origin = pathVars.first(where: { $0 == declare }) {
-                    throw URLRouterError.ambiguousURLVariable(origin.formatOfPath, format)
+                    throw URLMatchError.ambiguousURLVariable(origin.formatOfPath, format)
                 }
                 pathVars.append(declare)
                 patterns.append(.pathVariable)
@@ -69,11 +69,11 @@ public final class URLSlicer {
             let format = URLVariable.formatOfQuery(query)
             let declare = URLVariable(name: query.name, type: type)
             if let origin = pathVars.first(where: { $0 == declare }) {
-                throw URLRouterError.ambiguousURLVariable(origin.formatOfPath, format)
+                throw URLMatchError.ambiguousURLVariable(origin.formatOfPath, format)
             }
             
             if let origin = queryVars.first(where: { $0 == declare }) {
-                throw URLRouterError.ambiguousURLVariable(origin.formatOfQuery, format)
+                throw URLMatchError.ambiguousURLVariable(origin.formatOfQuery, format)
             }
             
             queryVars.append(declare)

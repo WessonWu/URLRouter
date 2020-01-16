@@ -1,6 +1,6 @@
 import Foundation
 
-public enum URLRouterError: Swift.Error {
+public enum URLMatchError: Swift.Error {
     // pattern parse
     case unresolvedURLVariable(String)
     case ambiguousURLVariable(String, String)
@@ -11,7 +11,7 @@ public enum URLRouterError: Swift.Error {
     case underlying(Error)
 }
 
-extension URLRouterError: LocalizedError {
+extension URLMatchError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case let .unresolvedURLVariable(v1):
