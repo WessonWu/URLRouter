@@ -27,13 +27,21 @@ public final class URLRouter {
         }
     }
     
-    public static let shared = URLRouter()
+    // default Router
+    public static let `default` = URLRouter()
     // MARK: - Init
     public init() {}
-    
-    // MARK: - Register
+    // MARK: - private Attrs
+    private let matcher = URLMatcher()
+    @SerialAccess(value: [:]) private var openURLHandlers: [AnyHashable: OpenURLHandler]
+//    @SerialAccess(value: [:]) private var viewControllerHandlers: [AnyHashable: ViewControllerHandler]
+//    private var valueHandlers: [AnyHashable: AnyValueHandler] = [:]
+}
+
+// MARK: - Register & Unregister
+public extension URLRouter {
     @discardableResult
-    public func register(_ pattern: URLConvertible, handler: @escaping OpenURLHandler) -> Result<String, URLRouterError> {
+    func register(_ pattern: URLConvertible, handler: @escaping OpenURLHandler) -> Result<String, URLRouterError> {
         let result = matcher.register(pattern: pattern)
         if case let .success(tag) = result {
             openURLHandlers[tag] = handler
@@ -42,29 +50,30 @@ public final class URLRouter {
     }
     
     @discardableResult
-    public func unregister(_ pattern: URLConvertible) -> Bool {
+    func unregister(_ pattern: URLConvertible) -> Bool {
         if let tag = matcher.unregister(pattern: pattern) {
             openURLHandlers.removeValue(forKey: tag)
             return true
         }
         return false
     }
-    
-    // MARK: - canOpen
-    public func canOpen(_ url: URLConvertible, exactly: Bool = false) -> Bool {
+}
+
+// MARK: - canOpen & open
+public extension URLRouter {
+    func canOpen(_ url: URLConvertible, exactly: Bool = false) -> Bool {
         return matcher.canMatch(url, exactly: exactly)
     }
     
-    // MARK: - open
     @discardableResult
-    public func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Bool {
+    func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Bool {
         guard let handler = self.handler(for: url, parameters: parameters, userInfo: userInfo, completion: completion) else {
             return false
         }
         return handler()
     }
     
-    public func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Handler? {
+    func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: Completion? = nil) -> Handler? {
         guard let result = matcher.match(url),
             let handler = openURLHandlers[result.tag] else {
             return nil
@@ -77,12 +86,6 @@ public final class URLRouter {
         let context = Context(url: url, parameters: origin, userInfo: userInfo, completion: completion)
         return { handler(context) }
     }
-    
-    // MARK: - private Attrs
-    private let matcher = URLMatcher()
-    @SerialAccess(value: [:]) private var openURLHandlers: [AnyHashable: OpenURLHandler]
-//    @SerialAccess(value: [:]) private var viewControllerHandlers: [AnyHashable: ViewControllerHandler]
-//    private var valueHandlers: [AnyHashable: AnyValueHandler] = [:]
 }
 
 public extension URLRouter.Context {
