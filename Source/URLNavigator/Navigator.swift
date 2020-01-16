@@ -17,16 +17,18 @@ open class Navigator: NavigatorType {
   }
 
   open func register(_ pattern: URLPattern, _ factory: @escaping ViewControllerFactory) {
-    let result = matcher.register(pattern: pattern)
-    if case let .success(tag) = result {
-        viewControllerFactories[tag] = factory
+    let key = pattern
+    let result = matcher.register(pattern: pattern, tag: key)
+    if case .success = result {
+        viewControllerFactories[key] = factory
     }
   }
 
   open func handle(_ pattern: URLPattern, _ factory: @escaping URLOpenHandlerFactory) {
-    let result = matcher.register(pattern: pattern)
-    if case let .success(tag) = result {
-        handlerFactories[tag] = factory
+    let key = pattern
+    let result = matcher.register(pattern: pattern, tag: key)
+    if case .success = result {
+        handlerFactories[key] = factory
     }
   }
 

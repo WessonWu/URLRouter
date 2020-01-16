@@ -12,12 +12,11 @@ public struct URLVariable {
     public init?(path: String) {
         let parts = path.split(separator: ":")
             .map { $0.trimmingCharacters(in: CharacterSet(charactersIn: " ")) }
-            .filter { !$0.isEmpty }
-        guard parts.count == 2 else {
+        guard parts.count == 2 && parts.reduce(true, { $0 && !$1.isEmpty }) else {
             return nil
         }
-        
-        self.init(name: parts[0], type: parts[1])
+        let type = parts.count > 1 ? parts[1] : "string"
+        self.init(name: parts[0], type: type)
     }
 }
 

@@ -2,23 +2,9 @@
 import UIKit
 
 extension UIViewController {
-  private class var sharedApplication: UIApplication? {
-    let selector = NSSelectorFromString("sharedApplication")
-    return UIApplication.perform(selector)?.takeUnretainedValue() as? UIApplication
-  }
-
   /// Returns the current application's top most view controller.
   open class var topMost: UIViewController? {
-    guard let currentWindows = self.sharedApplication?.windows else { return nil }
-    var rootViewController: UIViewController?
-    for window in currentWindows {
-      if let windowRootViewController = window.rootViewController, window.isKeyWindow {
-        rootViewController = windowRootViewController
-        break
-      }
-    }
-
-    return self.topMost(of: rootViewController)
+    return self.topMost(of: UIApplication.shared.keyWindow?.rootViewController)
   }
 
   /// Returns the top most view controller from given view controller's stack.
