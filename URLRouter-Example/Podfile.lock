@@ -1,16 +1,24 @@
 PODS:
-  - URLRouter (0.1.0)
+  - URLRouter (0.1.0):
+    - URLRouter/Matcher (= 0.1.0)
+    - URLRouter/Router (= 0.1.0)
+  - URLRouter/Matcher (0.1.0)
+  - URLRouter/Router (0.1.0)
+  - URLRouter/Tests (0.1.0):
+    - URLRouter/Matcher
+    - URLRouter/Router
 
 DEPENDENCIES:
   - URLRouter (from `../`)
+  - URLRouter/Tests (from `../`)
 
 EXTERNAL SOURCES:
   URLRouter:
     :path: "../"
 
 SPEC CHECKSUMS:
-  URLRouter: 57a80272e10f78dc99baf79b2228912e9d74cc3d
+  URLRouter: cbc2728ef732d706fa35c1e55485c83e70db8623
 
-PODFILE CHECKSUM: eb2a313000aae35f5245a5e8198f17077e30cb13
+PODFILE CHECKSUM: 1461ea85bb453139fa7b8828b7e731deaeff078d
 
 COCOAPODS: 1.8.4

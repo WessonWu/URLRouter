@@ -6,7 +6,7 @@ target 'URLRouter-Example' do
   use_frameworks!
 
   # Pods for URLRouter-Example
-  pod 'URLRouter', :path => '../'
+  pod 'URLRouter', :path => '../', :testspecs => ['Tests']
 
   target 'URLRouter-ExampleTests' do
     inherit! :search_paths
