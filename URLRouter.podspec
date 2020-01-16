@@ -10,6 +10,11 @@ Pod::Spec.new do |s|
   s.license      = "GPL"
   s.author       = { "wuweixin" => "wessonwu94@gmail.com" }
   s.source       = { :git => "https://github.com/WessonWu/URLRouter.git", :tag => "#{s.version}" }
+  s.requires_arc     = true
+  s.swift_version    = "5.0"
+  
+  s.ios.deployment_target = "8.0"
+  s.tvos.deployment_target = "9.0"
 
   s.subspec 'Matcher' do |sp|
       sp.frameworks = 'Foundation'
@@ -17,7 +22,7 @@ Pod::Spec.new do |s|
   end
   
   s.subspec 'Router' do |sp|
-      sp.frameworks = 'Foundation'
+      sp.frameworks = 'Foundation', 'UIKit'
       sp.source_files = 'Source/URLRouter/**/*.swift'
       sp.dependency 'URLRouter/Matcher'
   end
