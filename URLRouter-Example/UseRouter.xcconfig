@@ -10,6 +10,6 @@
 // https://help.apple.com/xcode/#/dev745c5c974
 
 // use router
-//OTHER_SWIFT_FLAGS = $(inherited) -D USE_ROUTER
+OTHER_SWIFT_FLAGS = $(inherited) -D USE_ROUTER
 // use navigator
-OTHER_SWIFT_FLAGS = $(inherited)
+//OTHER_SWIFT_FLAGS = $(inherited)

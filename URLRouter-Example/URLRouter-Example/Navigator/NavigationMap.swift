@@ -16,10 +16,13 @@ enum NavigationMap {
         #if USE_ROUTER
         let router = URLRouter.default
         router.register("navigator://user/<username:string>") { (context, completion) -> Bool in
-            guard let nav = UIViewController.topMost?.navigationController else {
-                return false
+            guard let username = context.string(forKey: "username"),
+                let nav = UIViewController.topMost?.navigationController else {
+                    return false
             }
-            nav.pushViewController(UserViewController(username: context.string(for: "username")), animated: true)
+            nav.pushViewController(
+                UserViewController(username: username),
+                animated: true)
             completion?()
             return true
         }
@@ -69,9 +72,9 @@ enum NavigationMap {
     #if USE_ROUTER
     private static func alert() -> URLRouter.OpenURLHandler {
         return { context, completion in
-            guard let topMost = UIViewController.topMost else { return false }
-            let title = context.string(for: "title")
-            let message = context.string(for: "message")
+            guard let title = context.string(forKey: "title"),
+                let topMost = UIViewController.topMost else { return false }
+            let message = context.string(forKey: "message")
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             topMost.present(alertController, animated: true, completion: completion)

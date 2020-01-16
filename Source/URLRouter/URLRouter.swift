@@ -15,8 +15,8 @@ public final class URLRouter {
     public final class Context {
         public let url: URLConvertible
         public let pattern: String
-        public let parameters: [AnyHashable: Any]
-        public let userInfo: Any?
+        public var parameters: [AnyHashable: Any]
+        public var userInfo: Any?
         
         public init(url: URLConvertible, pattern: String, parameters: [AnyHashable: Any], userInfo: Any? = nil) {
             self.url = url
@@ -183,82 +183,82 @@ public extension URLRouter.Context {
     
     // MARK: - Exact Value
     @inlinable
-    func string(forKey key: AnyHashable, default value: String = "") -> String {
+    func string(forKey key: AnyHashable, default value: String) -> String {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func bool(forKey key: AnyHashable, default value: Bool = false) -> Bool {
+    func bool(forKey key: AnyHashable, default value: Bool) -> Bool {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func int(forKey key: AnyHashable, default value: Int = 0) -> Int {
+    func int(forKey key: AnyHashable, default value: Int) -> Int {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func int8(forKey key: AnyHashable, default value: Int8 = 0) -> Int8 {
+    func int8(forKey key: AnyHashable, default value: Int8) -> Int8 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func int16(forKey key: AnyHashable, default value: Int16 = 0) -> Int16 {
+    func int16(forKey key: AnyHashable, default value: Int16) -> Int16 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func int32(forKey key: AnyHashable, default value: Int32 = 0) -> Int32 {
+    func int32(forKey key: AnyHashable, default value: Int32) -> Int32 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func int64(forKey key: AnyHashable, default value: Int64 = 0) -> Int64 {
+    func int64(forKey key: AnyHashable, default value: Int64) -> Int64 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func uint(forKey key: AnyHashable, default value: UInt = 0) -> UInt {
+    func uint(forKey key: AnyHashable, default value: UInt) -> UInt {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func uint8(forKey key: AnyHashable, default value: UInt8 = 0) -> UInt8 {
+    func uint8(forKey key: AnyHashable, default value: UInt8) -> UInt8 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func uint16(forKey key: AnyHashable, default value: UInt16 = 0) -> UInt16 {
+    func uint16(forKey key: AnyHashable, default value: UInt16) -> UInt16 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func uint32(forKey key: AnyHashable, default value: UInt32 = 0) -> UInt32 {
+    func uint32(forKey key: AnyHashable, default value: UInt32) -> UInt32 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func uint64(forKey key: AnyHashable, default value: UInt64 = 0) -> UInt64 {
+    func uint64(forKey key: AnyHashable, default value: UInt64) -> UInt64 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func double(forKey key: AnyHashable, default value: Double = 0) -> Double {
+    func double(forKey key: AnyHashable, default value: Double) -> Double {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func float(forKey key: AnyHashable, default value: Float = 0) -> Float {
+    func float(forKey key: AnyHashable, default value: Float) -> Float {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func float32(forKey key: AnyHashable, default value: Float32 = 0) -> Float32 {
+    func float32(forKey key: AnyHashable, default value: Float32) -> Float32 {
         return self.value(forKey: key, default: value)
     }
     
     @inlinable
-    func float64(forKey key: AnyHashable, default value: Float64 = 0) -> Float64 {
+    func float64(forKey key: AnyHashable, default value: Float64) -> Float64 {
         return self.value(forKey: key, default: value)
     }
 }
