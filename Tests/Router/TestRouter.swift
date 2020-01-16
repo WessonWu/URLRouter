@@ -19,19 +19,19 @@ class TestRouter: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
         router.register("myapp://host/user/<username: string>") { (context, completion) -> Bool in
-            completion?(context)
+            completion?()
             return true
         }
         
         router.open("myapp://host/user/kobe") { (context) in
-            XCTAssertEqual(context.string(for: "username"), "kobe")
+            XCTAssertEqual(context.string(forKey: "username"), "kobe")
         }
         router.open("myapp://host/user/tank", parameters: ["username": "james"]) { (context) in
-            XCTAssertEqual(context.string(for: "username"), "james")
+            XCTAssertEqual(context.string(forKey: "username"), "james")
         }
         
         router.open("myapp://host/user/kobe", userInfo: "hello") { (context) in
-            XCTAssertEqual(context.string(for: "username"), "kobe")
+            XCTAssertEqual(context.string(forKey: "username"), "kobe")
             XCTAssertEqual(context.userInfo as? String, "hello")
         }
         
@@ -39,12 +39,12 @@ class TestRouter: XCTestCase {
         
         // 通配符
         router.register("https://*") { (context, completion) -> Bool in
-            completion?(context)
+            completion?()
             return true
         }
         
         router.register("*://*") { (context, completion) -> Bool in
-            completion?(context)
+            completion?()
             return true
         }
         
@@ -59,7 +59,7 @@ class TestRouter: XCTestCase {
     
     func testUnregister() {
         router.register("https://*") { (context, completion) -> Bool in
-            completion?(context)
+            completion?()
             return true
         }
         
