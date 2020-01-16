@@ -8,19 +8,19 @@ public typealias URLRouterError = URLMatchError
 
 public final class URLRouter {
     public typealias OpenURLHandler = (Context) -> Bool
-//    public typealias ViewControllerHandler = (Context) -> UIViewController?
-//    public typealias AnyValueHandler = (Context) -> Any?
     
     public typealias Completion = (Context) -> Void
     public typealias Handler = () -> Bool
     public final class Context {
         public let url: URLConvertible
+        public let pattern: String
         public let parameters: [AnyHashable: Any]
         public let userInfo: Any?
         public let completion: Completion?
         
-        public init(url: URLConvertible, parameters: [AnyHashable: Any], userInfo: Any? = nil, completion: Completion? = nil) {
+        public init(url: URLConvertible, pattern: String, parameters: [AnyHashable: Any], userInfo: Any? = nil, completion: Completion? = nil) {
             self.url = url
+            self.pattern = pattern
             self.parameters = parameters
             self.userInfo = userInfo
             self.completion = completion
@@ -34,25 +34,24 @@ public final class URLRouter {
     // MARK: - private Attrs
     private let matcher = URLMatcher()
     @SerialAccess(value: [:]) private var openURLHandlers: [AnyHashable: OpenURLHandler]
-//    @SerialAccess(value: [:]) private var viewControllerHandlers: [AnyHashable: ViewControllerHandler]
-//    private var valueHandlers: [AnyHashable: AnyValueHandler] = [:]
 }
 
 // MARK: - Register & Unregister
 public extension URLRouter {
     @discardableResult
     func register(_ pattern: URLConvertible, handler: @escaping OpenURLHandler) -> Result<String, URLRouterError> {
-        let result = matcher.register(pattern: pattern)
-        if case let .success(tag) = result {
-            openURLHandlers[tag] = handler
+        let key = pattern.absoluteString
+        let result = matcher.register(pattern: pattern, tag: key)
+        if case .success = result {
+            openURLHandlers[key] = handler
         }
         return result
     }
     
     @discardableResult
     func unregister(_ pattern: URLConvertible) -> Bool {
-        if let tag = matcher.unregister(pattern: pattern) {
-            openURLHandlers.removeValue(forKey: tag)
+        if let key = matcher.unregister(pattern: pattern) {
+            openURLHandlers.removeValue(forKey: key)
             return true
         }
         return false
@@ -83,7 +82,7 @@ public extension URLRouter {
         if let custom = parameters {
             origin.merge(custom, uniquingKeysWith: {_, v2 in v2 })
         }
-        let context = Context(url: url, parameters: origin, userInfo: userInfo, completion: completion)
+        let context = Context(url: url, pattern: result.tag, parameters: origin, userInfo: userInfo, completion: completion)
         return { handler(context) }
     }
 }
