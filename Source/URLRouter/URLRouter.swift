@@ -7,16 +7,14 @@ import Foundation
 public typealias URLRouterError = URLMatchError
 
 public final class URLRouter {
-    public typealias OpenURLHandler = (Context, Completion?) -> Bool
+    public typealias OpenURLHandler = (Context) -> Bool
     
-    public typealias Completion = () -> Void
     public typealias Handler = () -> Bool
-    public typealias CompletionHandler = (Context) -> Void
     public final class Context {
         public let url: URLConvertible
         public let pattern: String
-        public var parameters: [AnyHashable: Any]
-        public var userInfo: Any?
+        public let parameters: [AnyHashable: Any]
+        public let userInfo: Any?
         
         public init(url: URLConvertible, pattern: String, parameters: [AnyHashable: Any], userInfo: Any? = nil) {
             self.url = url
@@ -64,14 +62,14 @@ public extension URLRouter {
     }
     
     @discardableResult
-    func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: CompletionHandler? = nil) -> Bool {
-        guard let handler = self.handler(for: url, parameters: parameters, userInfo: userInfo, completion: completion) else {
+    func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> Bool {
+        guard let handler = self.handler(for: url, parameters: parameters, userInfo: userInfo) else {
             return false
         }
         return handler()
     }
     
-    func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, completion: CompletionHandler? = nil) -> Handler? {
+    func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> Handler? {
         guard let result = matcher.match(url),
             let handler = openURLHandlers[result.tag] else {
             return nil
@@ -82,10 +80,7 @@ public extension URLRouter {
             origin.merge(custom, uniquingKeysWith: {_, v2 in v2 })
         }
         let context = Context(url: url, pattern: result.tag, parameters: origin, userInfo: userInfo)
-        if let completion = completion {
-            return { handler(context, { completion(context) }) }
-        }
-        return { handler(context, nil) }
+        return { handler(context) }
     }
 }
 

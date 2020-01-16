@@ -98,9 +98,10 @@ extension UserListViewController: UITableViewDelegate {
         let user = self.users[indexPath.row]
         
         #if USE_ROUTER
-        URLRouter.default.open(user.urlString) { context in
+        let userInfo = CompletionInfo  { context in
             print("[Router] push: \(user.urlString)")
         }
+        URLRouter.default.open(user.urlString, userInfo: userInfo)
         #else
         let isPushed = self.navigator.push(user.urlString) != nil
         if isPushed {

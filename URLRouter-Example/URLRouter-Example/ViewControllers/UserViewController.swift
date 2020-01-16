@@ -119,9 +119,10 @@ extension UserViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: false)
         let repo = self.repos[indexPath.row]
         #if USE_ROUTER
-        URLRouter.default.open(repo.urlString) { context in
+        let userInfo = CompletionInfo { (context) in
             print("[Router] push: \(repo.urlString)")
         }
+        URLRouter.default.open(repo.urlString, userInfo: userInfo)
         #else
         let webViewController = self.navigator.present(repo.urlString, wrap: nil)
         webViewController?.title = "\(self.username)/\(repo.name)"

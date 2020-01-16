@@ -11,11 +11,15 @@ import UIKit
 
 import URLRouter
 
+struct CompletionInfo {
+    let completion: ((URLRouter.Context) -> Void)?
+}
+
 enum NavigationMap {
     static func initialize(navigator: NavigatorType) {
         #if USE_ROUTER
         let router = URLRouter.default
-        router.register("navigator://user/<username:string>") { (context, completion) -> Bool in
+        router.register("navigator://user/<username:string>") { (context) -> Bool in
             guard let username = context.string(forKey: "username"),
                 let nav = UIViewController.topMost?.navigationController else {
                     return false
@@ -23,14 +27,16 @@ enum NavigationMap {
             nav.pushViewController(
                 UserViewController(username: username),
                 animated: true)
-            completion?()
+            if let completion = (context.userInfo as? CompletionInfo)?.completion {
+                completion(context)
+            }
             return true
         }
         router.register("http://*", handler: self.webViewControllerFactory)
         router.register("https://*", handler: self.webViewControllerFactory)
         
         router.register("navigator://alert", handler: self.alert())
-        router.register("navigator://*") { (context, _) -> Bool in
+        router.register("navigator://*") { (context) -> Bool in
             // No navigator match, do analytics or fallback function here
             print("[Router] NavigationMap.\(#function):\(#line) - global fallback function is called")
             return true
@@ -53,8 +59,12 @@ enum NavigationMap {
     }
     
     #if USE_ROUTER
-    private static func webViewControllerFactory(_ context: URLRouter.Context, _ completion: URLRouter.Completion?) -> Bool {
+    private static func webViewControllerFactory(_ context: URLRouter.Context) -> Bool {
         guard let url = try? context.url.asURL(), let topMost = UIViewController.topMost else { return false }
+        var completion: (() -> Void)? = nil
+        if let handler = (context.userInfo as? CompletionInfo)?.completion {
+            completion = { handler(context) }
+        }
         topMost.present(SFSafariViewController(url: url), animated: true, completion: completion)
         return true
     }
@@ -71,13 +81,17 @@ enum NavigationMap {
     
     #if USE_ROUTER
     private static func alert() -> URLRouter.OpenURLHandler {
-        return { context, completion in
+        return { context in
             guard let title = context.string(forKey: "title"),
                 let topMost = UIViewController.topMost else { return false }
             let message = context.string(forKey: "message")
             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            topMost.present(alertController, animated: true, completion: completion)
+            var handler: (() -> Void)? = nil
+            if let completion = (context.userInfo as? CompletionInfo)?.completion {
+                handler = { completion(context) }
+            }
+            topMost.present(alertController, animated: true, completion: handler)
             return true
         }
     }

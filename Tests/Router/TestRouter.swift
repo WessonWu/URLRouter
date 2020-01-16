@@ -13,55 +13,58 @@ class TestRouter: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    struct CompletionInfo {
+        let completion: ((URLRouter.Context) -> Void)?
+    }
+    
+    func register(_ url: URLConvertible) {
+        router.register(url) { (context) -> Bool in
+            guard let info = context.userInfo as? CompletionInfo else {
+                return false
+            }
+            
+            info.completion?(context)
+            return true
+        }
+    }
+    
+    func open(_ url: URLConvertible, parameters: [AnyHashable: Any] = [:], completion: ((URLRouter.Context) -> Void)? = nil) {
+        router.open(url, parameters: parameters, userInfo: CompletionInfo(completion: completion))
+    }
 
     func testNormal() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         
-        router.register("myapp://host/user/<username: string>") { (context, completion) -> Bool in
-            completion?()
-            return true
-        }
-        
-        router.open("myapp://host/user/kobe") { (context) in
+        register("myapp://host/user/<username: string>")
+        open("myapp://host/user/kobe") { (context) in
             XCTAssertEqual(context.string(forKey: "username"), "kobe")
         }
-        router.open("myapp://host/user/tank", parameters: ["username": "james"]) { (context) in
+        open("myapp://host/user/tank", parameters: ["username": "james"]) { (context) in
             XCTAssertEqual(context.string(forKey: "username"), "james")
         }
         
-        router.open("myapp://host/user/kobe", userInfo: "hello") { (context) in
+        open("myapp://host/user/kobe") { (context) in
             XCTAssertEqual(context.string(forKey: "username"), "kobe")
-            XCTAssertEqual(context.userInfo as? String, "hello")
         }
         
         XCTAssertFalse(router.canOpen("myapp://host/user"))
         
         // 通配符
-        router.register("https://*") { (context, completion) -> Bool in
-            completion?()
-            return true
-        }
-        
-        router.register("*://*") { (context, completion) -> Bool in
-            completion?()
-            return true
-        }
-        
-        router.open("https://www.example.com/user/host") { (context) in
+        register("https://*")
+        register("*://*")
+        open("https://www.example.com/user/host") { (context) in
             XCTAssertEqual(context.pattern, "https://*")
         }
         
-        router.open("unknown://www.example.com/user/host") { (context) in
+        open("unknown://www.example.com/user/host") { (context) in
             XCTAssertEqual(context.pattern, "*://*")
         }
     }
     
     func testUnregister() {
-        router.register("https://*") { (context, completion) -> Bool in
-            completion?()
-            return true
-        }
+        register("https://*")
         
         XCTAssertTrue(router.canOpen("https://www.baidu.com/path1"))
         XCTAssertFalse(router.canOpen("https://www.baidu.com/path1", exactly: true))
