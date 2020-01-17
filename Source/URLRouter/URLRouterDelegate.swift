@@ -1,7 +1,9 @@
+import Foundation
+
 #if os(iOS) || os(tvOS)
 import UIKit
 
-public protocol NavigatorDelegate: class {
+public protocol URLRouterDelegate: AnyObject {
   /// Returns whether the navigator should push the view controller or not. It returns `true` for
   /// default.
   func shouldPush(viewController: UIViewController, from: UINavigationControllerType) -> Bool
@@ -11,7 +13,7 @@ public protocol NavigatorDelegate: class {
   func shouldPresent(viewController: UIViewController, from: UIViewControllerType) -> Bool
 }
 
-extension NavigatorDelegate {
+extension URLRouterDelegate {
   public func shouldPush(viewController: UIViewController, from: UINavigationControllerType) -> Bool {
     return true
   }

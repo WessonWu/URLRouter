@@ -27,13 +27,6 @@ Pod::Spec.new do |s|
       sp.dependency 'URLRouter/Matcher'
   end
   
-  # borrow from: https://github.com/wanggang316/URLRouter
-  s.subspec 'Navigator' do |sp|
-      sp.frameworks = 'Foundation', 'UIKit'
-      sp.source_files = 'Source/URLNavigator/**/*.swift'
-      sp.dependency 'URLRouter/Matcher'
-  end
-  
   s.default_subspecs = ['Matcher', 'Router']
   
   # for test

@@ -15,7 +15,7 @@ class TestRouter: XCTestCase {
     }
     
     struct CompletionInfo {
-        let completion: ((URLRouter.Context) -> Void)?
+        let completion: ((URLRouterContext) -> Void)?
     }
     
     func register(_ url: URLConvertible) {
@@ -29,7 +29,7 @@ class TestRouter: XCTestCase {
         }
     }
     
-    func open(_ url: URLConvertible, parameters: [AnyHashable: Any] = [:], completion: ((URLRouter.Context) -> Void)? = nil) {
+    func open(_ url: URLConvertible, parameters: [AnyHashable: Any] = [:], completion: ((URLRouterContext) -> Void)? = nil) {
         router.open(url, parameters: parameters, userInfo: CompletionInfo(completion: completion))
     }
 

@@ -13,9 +13,7 @@ import URLRouter
 final class UserViewController: UIViewController {
     
     // MARK: Properties
-    #if !USE_ROUTER
-    private let navigator: NavigatorType
-    #endif
+    private let navigator: URLRouterType
     let username: String
     var repos = [Repo]()
     
@@ -26,20 +24,12 @@ final class UserViewController: UIViewController {
     
     
     // MARK: Initializing
-    #if USE_ROUTER
-    init(username: String) {
-        self.username = username
-        super.init(nibName: nil, bundle: nil)
-        self.title = "\(username)'s Repositories"
-    }
-    #else
-    init(navigator: NavigatorType, username: String) {
+    init(navigator: URLRouterType, username: String) {
         self.navigator = navigator
         self.username = username
         super.init(nibName: nil, bundle: nil)
         self.title = "\(username)'s Repositories"
     }
-    #endif
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -118,15 +108,8 @@ extension UserViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         let repo = self.repos[indexPath.row]
-        #if USE_ROUTER
-        let userInfo = CompletionInfo { (context) in
-            print("[Router] push: \(repo.urlString)")
-        }
-        URLRouter.default.open(repo.urlString, userInfo: userInfo)
-        #else
         let webViewController = self.navigator.present(repo.urlString, wrap: nil)
         webViewController?.title = "\(self.username)/\(repo.name)"
         print("[Navigator] push: \(repo.urlString)")
-        #endif
     }
 }

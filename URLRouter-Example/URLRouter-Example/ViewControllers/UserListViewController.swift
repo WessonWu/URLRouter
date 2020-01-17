@@ -13,9 +13,7 @@ import URLRouter
 class UserListViewController: UIViewController {
     
     // MARK: Properties
-    #if !USE_ROUTER
-    private let navigator: NavigatorType
-    #endif
+    private let navigator: URLRouterType
     let users = [User(name: "apple", urlString: "navigator://user/apple"),
                  User(name: "google", urlString: "navigator://user/google"),
                  User(name: "facebook", urlString: "navigator://user/facebook"),
@@ -30,14 +28,7 @@ class UserListViewController: UIViewController {
     
     
     // MARK: Initializing
-    
-    #if USE_ROUTER
-    override func loadView() {
-        super.loadView()
-        self.title = "GitHub Users"
-    }
-    #else
-    init(navigator: NavigatorType) {
+    init(navigator: URLRouterType) {
         self.navigator = navigator
         super.init(nibName: nil, bundle: nil)
         self.title = "GitHub Users"
@@ -46,7 +37,6 @@ class UserListViewController: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    #endif
     
     
     // MARK: View Life Cycle
@@ -97,19 +87,12 @@ extension UserListViewController: UITableViewDelegate {
         
         let user = self.users[indexPath.row]
         
-        #if USE_ROUTER
-        let userInfo = CompletionInfo  { context in
-            print("[Router] push: \(user.urlString)")
-        }
-        URLRouter.default.open(user.urlString, userInfo: userInfo)
-        #else
         let isPushed = self.navigator.push(user.urlString) != nil
         if isPushed {
             print("[Navigator] push: \(user.urlString)")
         } else {
             print("[Navigator] open: \(user.urlString)")
-            self.navigator.open(user.urlString)
+            self.navigator.handle(user.urlString)
         }
-        #endif
     }
 }
