@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
   s.version      = "0.1.0"
   s.summary      = "Powerful & Efficient URL Routing for Swift"
   s.homepage     = "https://github.com/WessonWu/URLRouter"
-  s.license      = "GPL"
+  s.license      = { :type => "MIT", :file => "LICENSE" }
   s.author       = { "wuweixin" => "wessonwu94@gmail.com" }
   s.source       = { :git => "https://github.com/WessonWu/URLRouter.git", :tag => "#{s.version}" }
   s.requires_arc     = true
