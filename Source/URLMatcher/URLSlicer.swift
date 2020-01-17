@@ -1,6 +1,6 @@
 import Foundation
 
-public final class URLPatternContext {
+public struct URLPatternContext {
     public let patterns: [URLSlicePattern]
     public let pathVars: [URLVariable]?
     public let queryVars: [URLVariable]?

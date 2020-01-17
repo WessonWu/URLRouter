@@ -1,6 +1,6 @@
 import Foundation
 
-public final class URLRouterContext {
+public struct URLRouterContext {
     public let url: URLConvertible
     public let pattern: URLPattern
     public let values: [String: Any]
