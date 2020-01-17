@@ -31,9 +31,9 @@ class TestURLSlicer: XCTestCase {
     
     
     typealias ParseAssertion = (Result<URLPatternContext, URLMatchError>) -> Void
-    func parse(_ url: URLConvertible, assertion: ParseAssertion) {
+    func parse(_ pattern: URLPattern, assertion: ParseAssertion) {
         do {
-            let context = try URLSlicer.parse(pattern: url)
+            let context = try URLSlicer.parse(pattern: pattern)
             assertion(.success(context))
         } catch {
             if let resolvedError = error as? URLMatchError {
@@ -74,7 +74,7 @@ class TestURLSlicer: XCTestCase {
             XCTAssertNil(context.queryVars)
         }))
         
-        func testcase1(_ url: URLConvertible) {
+        func testcase1(_ url: URLPattern) {
             parse(url, assertion: parseSuccess({ (context) in
                 XCTAssertEqual(context.patterns, [.scheme("https"), .authority("www.example.com"), .path("user"), .pathVariable])
                 XCTAssertEqual(context.pathVars, [URLVariable(name: "username", type: "string")])

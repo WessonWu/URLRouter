@@ -4,8 +4,6 @@ import UIKit
 public typealias ViewControllerFactory = (_ router: URLRouterType, _ context: URLRouterContext) -> UIViewController?
 public typealias URLOpenHandlerFactory = (_ router: URLRouterType, _ context: URLRouterContext) -> Bool
 public typealias URLOpenHandler = () -> Bool
-
-public typealias URLPattern = URLConvertible
 public typealias URLRouterError = URLMatchError
 
 public protocol URLRouterType {
@@ -23,14 +21,14 @@ public protocol URLRouterType {
     /// - parameter url: An URL to find view controllers.
     ///
     /// - returns: A match view controller or `nil` if not matched.
-    func viewController(for url: URLConvertible, parameters: [AnyHashable: Any]?, userInfo: Any?) -> UIViewController?
+    func viewController(for url: URLConvertible, values: [String: Any]?, userInfo: Any?) -> UIViewController?
     
     /// Returns a matching URL handler from the specified URL.
     ///
     /// - parameter url: An URL to find url handlers.
     ///
     /// - returns: A matching handler factory or `nil` if not matched.
-    func handler(for url: URLConvertible, parameters: [AnyHashable: Any]?, userInfo: Any?) -> URLOpenHandler?
+    func handler(for url: URLConvertible, values: [String: Any]?, userInfo: Any?) -> URLOpenHandler?
     
     /// Pushes a matching view controller to the navigation controller stack.
     ///
@@ -38,7 +36,7 @@ public protocol URLRouterType {
     ///         parameters. This method eventually gets called when pushing a view controller with
     ///         an URL, so it's recommended to implement this method only for mocking.
     @discardableResult
-    func pushURL(_ url: URLConvertible, parameters: [AnyHashable: Any]?, userInfo: Any?, from: UINavigationControllerType?, animated: Bool) -> UIViewController?
+    func pushURL(_ url: URLConvertible, values: [String: Any]?, userInfo: Any?, from: UINavigationControllerType?, animated: Bool) -> UIViewController?
     
     /// Pushes the view controller to the navigation controller stack.
     ///
@@ -54,7 +52,7 @@ public protocol URLRouterType {
     ///         parameters. This method eventually gets called when presenting a view controller with
     ///         an URL, so it's recommended to implement this method only for mocking.
     @discardableResult
-    func presentURL(_ url: URLConvertible, parameters: [AnyHashable: Any]?, userInfo: Any?, wrap: UINavigationController.Type?, from: UIViewControllerType?, animated: Bool, completion: (() -> Void)?) -> UIViewController?
+    func presentURL(_ url: URLConvertible, values: [String: Any]?, userInfo: Any?, wrap: UINavigationController.Type?, from: UIViewControllerType?, animated: Bool, completion: (() -> Void)?) -> UIViewController?
     
     /// Presents the view controller.
     ///
@@ -70,7 +68,7 @@ public protocol URLRouterType {
     ///         parameters. This method eventually gets called when opening an url, so it's
     ///         recommended to implement this method only for mocking.
     @discardableResult
-    func handleURL(_ url: URLConvertible, parameters: [AnyHashable: Any]?, userInfo: Any?) -> Bool
+    func handleURL(_ url: URLConvertible, values: [String: Any]?, userInfo: Any?) -> Bool
 }
 
 
@@ -78,16 +76,16 @@ public protocol URLRouterType {
 
 public extension URLRouterType {
     func viewController(for url: URLConvertible) -> UIViewController? {
-        return self.viewController(for: url, parameters: [:], userInfo: nil)
+        return self.viewController(for: url, values: [:], userInfo: nil)
     }
     
     func handler(for url: URLConvertible) -> URLOpenHandler? {
-        return self.handler(for: url, parameters: [:], userInfo: nil)
+        return self.handler(for: url, values: [:], userInfo: nil)
     }
     
     @discardableResult
-    func pushURL(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, from: UINavigationControllerType? = nil, animated: Bool = true) -> UIViewController? {
-        guard let viewController = self.viewController(for: url, parameters: parameters, userInfo: userInfo) else { return nil }
+    func pushURL(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil, from: UINavigationControllerType? = nil, animated: Bool = true) -> UIViewController? {
+        guard let viewController = self.viewController(for: url, values: values, userInfo: userInfo) else { return nil }
         return self.pushViewController(viewController, from: from, animated: animated)
     }
     
@@ -101,8 +99,8 @@ public extension URLRouterType {
     }
     
     @discardableResult
-    func presentURL(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, wrap: UINavigationController.Type? = nil, from: UIViewControllerType? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> UIViewController? {
-        guard let viewController = self.viewController(for: url, parameters: parameters, userInfo: userInfo) else { return nil }
+    func presentURL(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil, wrap: UINavigationController.Type? = nil, from: UIViewControllerType? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> UIViewController? {
+        guard let viewController = self.viewController(for: url, values: values, userInfo: userInfo) else { return nil }
         return self.presentViewController(viewController, wrap: wrap, from: from, animated: animated, completion: completion)
     }
     
@@ -123,8 +121,8 @@ public extension URLRouterType {
     }
     
     @discardableResult
-    func handleURL(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> Bool {
-        guard let handler = self.handler(for: url, parameters: parameters, userInfo: userInfo) else { return false }
+    func handleURL(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil) -> Bool {
+        guard let handler = self.handler(for: url, values: values, userInfo: userInfo) else { return false }
         return handler()
     }
 }
@@ -134,8 +132,8 @@ public extension URLRouterType {
 
 public extension URLRouterType {
     @discardableResult
-    func push(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, from: UINavigationControllerType? = nil, animated: Bool = true) -> UIViewController? {
-        return self.pushURL(url, parameters: parameters, userInfo: userInfo, from: from, animated: animated)
+    func push(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil, from: UINavigationControllerType? = nil, animated: Bool = true) -> UIViewController? {
+        return self.pushURL(url, values: values, userInfo: userInfo, from: from, animated: animated)
     }
     
     @discardableResult
@@ -144,8 +142,8 @@ public extension URLRouterType {
     }
     
     @discardableResult
-    func present(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil, wrap: UINavigationController.Type? = nil, from: UIViewControllerType? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> UIViewController? {
-        return self.presentURL(url, parameters: parameters, userInfo: userInfo, wrap: wrap, from: from, animated: animated, completion: completion)
+    func present(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil, wrap: UINavigationController.Type? = nil, from: UIViewControllerType? = nil, animated: Bool = true, completion: (() -> Void)? = nil) -> UIViewController? {
+        return self.presentURL(url, values: values, userInfo: userInfo, wrap: wrap, from: from, animated: animated, completion: completion)
     }
     
     @discardableResult
@@ -154,8 +152,8 @@ public extension URLRouterType {
     }
     
     @discardableResult
-    func handle(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> Bool {
-        return self.handleURL(url, parameters: parameters, userInfo: userInfo)
+    func handle(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil) -> Bool {
+        return self.handleURL(url, values: values, userInfo: userInfo)
     }
 }
 #endif

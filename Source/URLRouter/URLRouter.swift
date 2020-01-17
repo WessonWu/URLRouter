@@ -2,7 +2,7 @@
 import Foundation
 // - Example: myapp://module/user/<username:string>?age=<int>&male=<bool>
 // match: myapp://module/user/xiaoming?age=23&male=true
-// parameters: ["username": "xiaoming", "age": 23, "male": true]
+// values: ["username": "xiaoming", "age": 23, "male": true]
 
 public final class URLRouter: URLRouterType {
     // default Router
@@ -22,15 +22,15 @@ public final class URLRouter: URLRouterType {
         return register(pattern, factory, to: &self.handlerFactories)
     }
     
-    public func viewController(for url: URLConvertible, parameters: [AnyHashable : Any]? = nil, userInfo: Any? = nil) -> UIViewController? {
-        guard let context = match(url, parameters: parameters, userInfo: userInfo) else {
+    public func viewController(for url: URLConvertible, values: [String : Any]? = nil, userInfo: Any? = nil) -> UIViewController? {
+        guard let context = match(url, values: values, userInfo: userInfo) else {
             return nil
         }
         return viewController(for: context)
     }
     
-    public func handler(for url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> URLOpenHandler? {
-        guard let context = match(url, parameters: parameters, userInfo: userInfo) else {
+    public func handler(for url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil) -> URLOpenHandler? {
+        guard let context = match(url, values: values, userInfo: userInfo) else {
             return nil
         }
         return handler(for: context)
@@ -39,14 +39,14 @@ public final class URLRouter: URLRouterType {
     // MARK: - private Attrs
     private let matcher = URLMatcher()
     
-    @SerialAccess(value: [:]) private var viewControllerFactories: [AnyHashable: ViewControllerFactory]
-    @SerialAccess(value: [:]) private var handlerFactories: [AnyHashable: URLOpenHandlerFactory]
+    @SerialAccess(value: [:]) private var viewControllerFactories: [String: ViewControllerFactory]
+    @SerialAccess(value: [:]) private var handlerFactories: [String: URLOpenHandlerFactory]
 }
 
 // MARK: - Unregister & canOpen & open
 public extension URLRouter {
     @discardableResult
-    func unregister(_ pattern: URLConvertible) -> Bool {
+    func unregister(_ pattern: URLPattern) -> Bool {
         if let key = matcher.unregister(pattern: pattern) {
             viewControllerFactories.removeValue(forKey: key)
             handlerFactories.removeValue(forKey: key)
@@ -60,8 +60,8 @@ public extension URLRouter {
     }
     
     @discardableResult
-    func open(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any? = nil) -> Bool {
-        guard let context = match(url, parameters: parameters, userInfo: userInfo) else {
+    func open(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any? = nil) -> Bool {
+        guard let context = match(url, values: values, userInfo: userInfo) else {
             return false
         }
         if let handler = handler(for: context) {
@@ -90,23 +90,22 @@ private extension URLRouter {
         return nil
     }
     
-    func match(_ url: URLConvertible, parameters: [AnyHashable: Any]? = nil, userInfo: Any?) -> URLRouterContext? {
+    func match(_ url: URLConvertible, values: [String: Any]? = nil, userInfo: Any?) -> URLRouterContext? {
         guard let result = matcher.match(url) else {
             return nil
         }
         
-        var finalValues = result.parameters
-        if let customValues = parameters {
+        var finalValues = result.values
+        if let customValues = values {
             finalValues.merge(customValues, uniquingKeysWith: {_, v2 in v2 })
         }
-        return URLRouterContext(url: url, pattern: result.tag, parameters: finalValues, userInfo: userInfo)
+        return URLRouterContext(url: url, pattern: result.tag, values: finalValues, userInfo: userInfo)
     }
     
-    func register<T>(_ pattern: URLPattern, _ factory: T, to factories: inout [AnyHashable: T]) -> Result<Void, URLRouterError> {
-        let key = pattern.absoluteString
-        switch matcher.register(pattern: pattern, tag: key) {
+    func register<T>(_ pattern: URLPattern, _ factory: T, to factories: inout [String: T]) -> Result<Void, URLRouterError> {
+        switch matcher.register(pattern: pattern, tag: pattern) {
         case .success:
-            factories[key] = factory
+            factories[pattern] = factory
             return .success(())
         case let .failure(error):
             return .failure(error)

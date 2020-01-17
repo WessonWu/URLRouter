@@ -18,8 +18,8 @@ class TestRouter: XCTestCase {
         let completion: ((URLRouterContext) -> Void)?
     }
     
-    func register(_ url: URLConvertible) {
-        router.register(url) { (_, context) -> Bool in
+    func register(_ pattern: URLPattern) {
+        router.register(pattern) { (_, context) -> Bool in
             guard let info = context.userInfo as? CompletionInfo else {
                 return false
             }
@@ -29,8 +29,8 @@ class TestRouter: XCTestCase {
         }
     }
     
-    func open(_ url: URLConvertible, parameters: [AnyHashable: Any] = [:], completion: ((URLRouterContext) -> Void)? = nil) {
-        router.open(url, parameters: parameters, userInfo: CompletionInfo(completion: completion))
+    func open(_ url: URLConvertible, values: [String: Any] = [:], completion: ((URLRouterContext) -> Void)? = nil) {
+        router.open(url, values: values, userInfo: CompletionInfo(completion: completion))
     }
 
     func testNormal() {
@@ -41,7 +41,7 @@ class TestRouter: XCTestCase {
         open("myapp://host/user/kobe") { (context) in
             XCTAssertEqual(context.string(forKey: "username"), "kobe")
         }
-        open("myapp://host/user/tank", parameters: ["username": "james"]) { (context) in
+        open("myapp://host/user/tank", values: ["username": "james"]) { (context) in
             XCTAssertEqual(context.string(forKey: "username"), "james")
         }
         

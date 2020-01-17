@@ -1,5 +1,6 @@
 import Foundation
 
+public typealias URLPattern = String
 public final class URLMatcher {
     // MARK: - Init
     public init() {}
@@ -65,32 +66,32 @@ public extension URLMatcher {
         }
         let pathValues = result.pathValues
         let endpoint = result.endpoint
-        var parameters: [String: Any] = [:]
+        var values: [String: Any] = [:]
         // query items
         components.queryItems?.forEach({ (query) in
-            parameters[query.name] = query.value
+            values[query.name] = query.value
         })
         // parse query variables
         endpoint.queryVars?.forEach({ (queryVar) in
-            if let rawValue = parameters[queryVar.name] as? String,
+            if let rawValue = values[queryVar.name] as? String,
                 let valueType = URLMatcher.valueType(of: queryVar.type) {
-                parameters[queryVar.name] = valueType.init(rawValue)
+                values[queryVar.name] = valueType.init(rawValue)
             }
         })
         pathValues.forEach { (key, value) in
-            parameters[key] = value
+            values[key] = value
         }
-        return URLMatchResult(tag: endpoint.tag, matched: result.matched, parameters: parameters)
+        return URLMatchResult(tag: endpoint.tag, matched: result.matched, values: values)
     }
 }
 
 // MARK: - Register & Unregister URLPatterns
 public extension URLMatcher {
     @discardableResult
-    func register(pattern url: URLConvertible, tag: String? = nil) -> Result<String, URLMatchError> {
+    func register(pattern: URLPattern, tag: String? = nil) -> Result<String, URLMatchError> {
         let context: URLPatternContext
         do {
-            context = try URLSlicer.parse(pattern: url)
+            context = try URLSlicer.parse(pattern: pattern)
         } catch {
             if let resolved = error as? URLMatchError {
                 return .failure(resolved)
@@ -113,10 +114,10 @@ public extension URLMatcher {
     }
     
     @discardableResult
-    func unregister(pattern url: URLConvertible) -> String? {
+    func unregister(pattern: URLPattern) -> String? {
         let context: URLPatternContext
         do {
-            context = try URLSlicer.parse(pattern: url)
+            context = try URLSlicer.parse(pattern: pattern)
         } catch {
             return nil
         }

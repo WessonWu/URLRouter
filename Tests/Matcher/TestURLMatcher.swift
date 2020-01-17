@@ -38,7 +38,7 @@ class TestURLMatcher: XCTestCase {
     }
     
     typealias RegisterAssertion = (Result<String, URLRouterError>) -> Void
-    func register(_ pattern: URLConvertible, tag: String? = nil, assertion: RegisterAssertion) {
+    func register(_ pattern: URLPattern, tag: String? = nil, assertion: RegisterAssertion) {
         let result = matcher.register(pattern: pattern, tag: tag)
         assertion(result)
     }
@@ -87,19 +87,19 @@ class TestURLMatcher: XCTestCase {
         match("https://www.example.com/user/test1/james") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test1")
-            XCTAssertEqual(context?.parameters["username"] as? String, "james")
+            XCTAssertEqual(context?.string(forKey: "username"), "james")
         }
         
         match("https://www.example.com/user/test1/中文测试") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test1")
-            XCTAssertEqual(context?.parameters["username"] as? String, "中文测试")
+            XCTAssertEqual(context?.string(forKey: "username"), "中文测试")
         }
         
         match("https://www.example.com/user/test2/101") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test2")
-            XCTAssertEqual(context?.parameters["intval"] as? Int, 101)
+            XCTAssertEqual(context?.int(forKey: "intval"), 101)
         }
         
         match("https://www.example.com/user/test2/10.1") { (context) in
@@ -109,23 +109,23 @@ class TestURLMatcher: XCTestCase {
         match("https://www.example.com/user/123/test3") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test3")
-            XCTAssertEqual(context?.parameters["uid"] as? Int, 123)
+            XCTAssertEqual(context?.int(forKey: "uid"), 123)
         }
         
         match("https://www.example.com/user/555/test4/true") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test4")
-            XCTAssertEqual(context?.parameters["uid"] as? Int, 555)
-            XCTAssertEqual(context?.parameters["man"] as? Bool, true)
+            XCTAssertEqual(context?.int(forKey: "uid"), 555)
+            XCTAssertEqual(context?.bool(forKey: "man"), true)
         }
         
         match("https://www.example.com/user/3602/test5?age=23&male=true&height=182.5") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test5")
-            XCTAssertEqual(context?.parameters["groupID"] as? Int, 3602)
-            XCTAssertEqual(context?.parameters["age"] as? Int, 23)
-            XCTAssertEqual(context?.parameters["male"] as? Bool, true)
-            XCTAssertEqual(context?.parameters["height"] as? Double, 182.5)
+            XCTAssertEqual(context?.int(forKey: "groupID"), 3602)
+            XCTAssertEqual(context?.int(forKey: "age"), 23)
+            XCTAssertEqual(context?.bool(forKey: "male"), true)
+            XCTAssertEqual(context?.double(forKey: "height"), 182.5)
         }
         
         let json: [String : Any] = ["k1": 1, "k2": "v2", "k3": true]
@@ -135,7 +135,7 @@ class TestURLMatcher: XCTestCase {
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test6")
             
-            let params = context?.parameters["params"] as? [String: Any]
+            let params: [String: Any]? = context?.value(forKey: "params")
             XCTAssertNotNil(params)
             
             XCTAssertEqual(params?["k1"] as? Int, json["k1"] as? Int)
@@ -148,7 +148,7 @@ class TestURLMatcher: XCTestCase {
         match("myapp://custom/test7/Kobe Bryant") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test7")
-            XCTAssertEqual(context?.parameters["username"] as? UserName, UserName(firstName: "Kobe", lastName: "Bryant"))
+            XCTAssertEqual(context?.value(forKey: "username"), UserName(firstName: "Kobe", lastName: "Bryant"))
         }
     }
     
@@ -167,18 +167,18 @@ class TestURLMatcher: XCTestCase {
         match("test8://test8/8") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test8://test8/<test8:int>")
-            XCTAssertEqual(context?.parameters["test8"] as? Int, 8)
+            XCTAssertEqual(context?.int(forKey: "test8"), 8)
         }
         match("test8://test8/nil") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test8://test8/*")
-            XCTAssertEqual(context?.parameters["test8"] as? Int, nil)
+            XCTAssertEqual(context?.int(forKey: "test8"), nil)
         }
         
         match("test8://test8/any") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test8://test8/*")
-            XCTAssertEqual(context?.parameters["test8"] as? Int, nil)
+            XCTAssertEqual(context?.int(forKey: "test8"), nil)
         }
         
         match("test8://test8/8/unknown") { (context) in
@@ -229,13 +229,13 @@ class TestURLMatcher: XCTestCase {
         match("test9://test9/true") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "*://test9/<test9:bool>")
-            XCTAssertEqual(context?.parameters["test9"] as? Bool, true)
+            XCTAssertEqual(context?.bool(forKey: "test9"), true)
         }
         
         match("test9://test9/false") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "*://test9/<test9:bool>")
-            XCTAssertEqual(context?.parameters["test9"] as? Bool, false)
+            XCTAssertEqual(context?.bool(forKey: "test9"), false)
         }
         
         match("test9://test9/not_bool") { (context) in
@@ -284,14 +284,14 @@ class TestURLMatcher: XCTestCase {
         match("test10://test10/101/test10/test10_2") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test10://test10/<test10_1:int>/test10/<test10_2:string>")
-            XCTAssertEqual(context?.parameters["test10_1"] as? Int, 101)
-            XCTAssertEqual(context?.parameters["test10_2"] as? String, "test10_2")
+            XCTAssertEqual(context?.int(forKey: "test10_1"), 101)
+            XCTAssertEqual(context?.string(forKey: "test10_2"), "test10_2")
         }
         
         match("test10://test10/not_int/test10/test10_2") { (context) in
             XCTAssertNotNil(context)
             XCTAssertEqual(context?.tag, "test10://test10/*/test10/<test10_2:string>")
-            XCTAssertEqual(context?.parameters["test10_2"] as? String, "test10_2")
+            XCTAssertEqual(context?.string(forKey: "test10_2"), "test10_2")
         }
         
         match("test10://test10/101/not_test10/test10_2") { (context) in

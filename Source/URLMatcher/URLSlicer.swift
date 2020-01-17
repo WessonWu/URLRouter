@@ -27,8 +27,8 @@ public extension URLSlicer {
         return slices
     }
         
-    class func parse(pattern url: URLConvertible) throws -> URLPatternContext {
-        let components = try makeURLComponents(url)
+    class func parse(pattern: URLPattern) throws -> URLPatternContext {
+        let components = try makeURLComponents(pattern)
         var patterns = commonSlices(from: components)
         let path = components.path
         let paths: [String]
