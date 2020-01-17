@@ -1,5 +1,5 @@
+#if os(iOS) || os(tvOS)
 import Foundation
-
 // - Example: myapp://module/user/<username:string>?age=<int>&male=<bool>
 // match: myapp://module/user/xiaoming?age=23&male=true
 // parameters: ["username": "xiaoming", "age": 23, "male": true]
@@ -13,12 +13,12 @@ public final class URLRouter: URLRouterType {
     public var delegate: URLRouterDelegate?
     
     @discardableResult
-    public func register(_ pattern: URLPattern, factory: @escaping ViewControllerFactory) -> Result<Void, URLRouterError> {
+    public func register(_ pattern: URLPattern, _ factory: @escaping ViewControllerFactory) -> Result<Void, URLRouterError> {
         return register(pattern, factory, to: &self.viewControllerFactories)
     }
     
     @discardableResult
-    public func register(_ pattern: URLPattern, factory: @escaping URLOpenHandlerFactory) -> Result<Void, URLRouterError> {
+    public func register(_ pattern: URLPattern, _ factory: @escaping URLOpenHandlerFactory) -> Result<Void, URLRouterError> {
         return register(pattern, factory, to: &self.handlerFactories)
     }
     
@@ -80,12 +80,12 @@ public extension URLRouter {
 // MARK: - Privates
 private extension URLRouter {
     func viewController(for context: URLRouterContext) -> UIViewController? {
-        return self.viewControllerFactories[context.pattern]?(context)
+        return self.viewControllerFactories[context.pattern]?(self, context)
     }
     
     func handler(for context: URLRouterContext) -> URLOpenHandler? {
         if let factory = handlerFactories[context.pattern] {
-            return { factory(context) }
+            return { factory(self, context) }
         }
         return nil
     }
@@ -137,3 +137,5 @@ final class SerialAccess<T> {
         self.value = value
     }
 }
+
+#endif

@@ -13,29 +13,39 @@ import URLRouter
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    private var navigator: URLRouter?
+    private var router: URLRouter?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        let navigator = URLRouter()
+        let router = URLRouter()
+//        let router = URLRouter.default
         
-        // Initialize navigation map
-        NavigationMap.initialize(navigator: navigator)
+        // Initialize router map
+        URLRouterMap.initialize(router: router)
         
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.makeKeyAndVisible()
         window.backgroundColor = .white
-        let userListViewController = UserListViewController(navigator: navigator)
+        let userListViewController = UserListViewController(router: router)
         window.rootViewController = UINavigationController(rootViewController: userListViewController)
         
         self.window = window
-        self.navigator = navigator
+        self.router = router
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:])-> Bool {
-        if navigator?.open(url) == true {
+        if router?.open(url) == true {
             return true
         }
+        
+//        if router?.handle(url) == true {
+//            return true
+//        }
+//
+//        if router?.present(url) != nil {
+//            return true
+//        }
+        
         return false
     }
 }

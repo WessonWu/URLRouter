@@ -13,12 +13,14 @@ import URLRouter
 class UserListViewController: UIViewController {
     
     // MARK: Properties
-    private let navigator: URLRouterType
-    let users = [User(name: "apple", urlString: "navigator://user/apple"),
-                 User(name: "google", urlString: "navigator://user/google"),
-                 User(name: "facebook", urlString: "navigator://user/facebook"),
-                 User(name: "alert", urlString: "navigator://alert?title=Hello&message=World"),
-                 User(name: "fallback", urlString: "navigator://notMatchable"),
+    private let router: URLRouterType
+    let users = [User(name: "apple", urlString: "router://user/apple"),
+                 User(name: "google", urlString: "router://user/google"),
+                 User(name: "facebook", urlString: "router://user/facebook"),
+                 User(name: "alert", urlString: "router://alert?title=Hello&message=World"),
+                 User(name: "fallback", urlString: "router://notMatchable"),
+                 User(name: "AutoParse BuildInTypes", urlString: "router://parse/buildIn/Lebron James?age=23&height=203.5"),
+                 User(name: "AutoParse CustomTypes", urlString: "router://parse/custom?player=Kobe Bryant"),
     ]
     
     
@@ -28,8 +30,8 @@ class UserListViewController: UIViewController {
     
     
     // MARK: Initializing
-    init(navigator: URLRouterType) {
-        self.navigator = navigator
+    init(router: URLRouterType) {
+        self.router = router
         super.init(nibName: nil, bundle: nil)
         self.title = "GitHub Users"
     }
@@ -87,12 +89,12 @@ extension UserListViewController: UITableViewDelegate {
         
         let user = self.users[indexPath.row]
         
-        let isPushed = self.navigator.push(user.urlString) != nil
+        let isPushed = self.router.push(user.urlString) != nil
         if isPushed {
-            print("[Navigator] push: \(user.urlString)")
+            print("[URLRouter] push: \(user.urlString)")
         } else {
-            print("[Navigator] open: \(user.urlString)")
-            self.navigator.handle(user.urlString)
+            print("[URLRouter] handle: \(user.urlString)")
+            self.router.handle(user.urlString)
         }
     }
 }

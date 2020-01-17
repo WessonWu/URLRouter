@@ -1,8 +1,8 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 
-public typealias ViewControllerFactory = (URLRouterContext) -> UIViewController?
-public typealias URLOpenHandlerFactory = (URLRouterContext) -> Bool
+public typealias ViewControllerFactory = (_ router: URLRouterType, _ context: URLRouterContext) -> UIViewController?
+public typealias URLOpenHandlerFactory = (_ router: URLRouterType, _ context: URLRouterContext) -> Bool
 public typealias URLOpenHandler = () -> Bool
 
 public typealias URLPattern = URLConvertible
@@ -13,11 +13,11 @@ public protocol URLRouterType {
     
     /// Registers a view controller factory to the URL pattern.
     @discardableResult
-    func register(_ pattern: URLPattern, factory: @escaping ViewControllerFactory) -> Result<Void, URLRouterError>
+    func register(_ pattern: URLPattern, _ factory: @escaping ViewControllerFactory) -> Result<Void, URLRouterError>
     
     /// Registers an URL open handler to the URL pattern.
     @discardableResult
-    func register(_ pattern: URLPattern, factory: @escaping URLOpenHandlerFactory) -> Result<Void, URLRouterError>
+    func register(_ pattern: URLPattern, _ factory: @escaping URLOpenHandlerFactory) -> Result<Void, URLRouterError>
     /// Returns a matching view controller from the specified URL.
     ///
     /// - parameter url: An URL to find view controllers.

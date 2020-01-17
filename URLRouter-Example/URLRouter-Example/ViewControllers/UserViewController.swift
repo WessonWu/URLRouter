@@ -13,7 +13,7 @@ import URLRouter
 final class UserViewController: UIViewController {
     
     // MARK: Properties
-    private let navigator: URLRouterType
+    private let router: URLRouterType
     let username: String
     var repos = [Repo]()
     
@@ -24,8 +24,8 @@ final class UserViewController: UIViewController {
     
     
     // MARK: Initializing
-    init(navigator: URLRouterType, username: String) {
-        self.navigator = navigator
+    init(router: URLRouterType, username: String) {
+        self.router = router
         self.username = username
         super.init(nibName: nil, bundle: nil)
         self.title = "\(username)'s Repositories"
@@ -108,8 +108,9 @@ extension UserViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         let repo = self.repos[indexPath.row]
-        let webViewController = self.navigator.present(repo.urlString, wrap: nil)
+        let webViewController = self.router.present(repo.urlString) {
+            print("[URLRouter] push: \(repo.urlString)")
+        }
         webViewController?.title = "\(self.username)/\(repo.name)"
-        print("[Navigator] push: \(repo.urlString)")
     }
 }

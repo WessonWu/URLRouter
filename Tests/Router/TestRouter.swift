@@ -19,7 +19,7 @@ class TestRouter: XCTestCase {
     }
     
     func register(_ url: URLConvertible) {
-        router.register(url) { (context) -> Bool in
+        router.register(url) { (_, context) -> Bool in
             guard let info = context.userInfo as? CompletionInfo else {
                 return false
             }

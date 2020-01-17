@@ -1,14 +1,12 @@
-import Foundation
-
 #if os(iOS) || os(tvOS)
 import UIKit
 
 public protocol URLRouterDelegate: AnyObject {
-  /// Returns whether the navigator should push the view controller or not. It returns `true` for
+  /// Returns whether the router should push the view controller or not. It returns `true` for
   /// default.
   func shouldPush(viewController: UIViewController, from: UINavigationControllerType) -> Bool
 
-  /// Returns whether the navigator should present the view controller or not. It returns `true`
+  /// Returns whether the router should present the view controller or not. It returns `true`
   /// for default.
   func shouldPresent(viewController: UIViewController, from: UIViewControllerType) -> Bool
 }
