@@ -10,6 +10,16 @@ public extension KeyValueCoding {
     func value<Value>(forKey key: Key, default value: Value) -> Value {
         return self.value(forKey: key) ?? value
     }
+    
+    @inlinable
+    func value<Value>(of type: Value.Type, forKey key: Key) -> Value? {
+        return self.value(forKey: key)
+    }
+    
+    @inlinable
+    func value<Value>(of type: Value.Type, forKey key: Key, default value: Value) -> Value {
+        return self.value(forKey: key) ?? value
+    }
 }
 
 // MARK: - Optional values for build in types
