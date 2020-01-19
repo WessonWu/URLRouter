@@ -14,4 +14,10 @@ public struct URLRouterContext {
     }
 }
 
-extension URLRouterContext: URLValueGettable {}
+extension URLRouterContext: KeyValueCoding {
+    public typealias Key = String
+    
+    public func value<Value>(forKey key: String) -> Value? {
+        return values[key] as? Value
+    }
+}
